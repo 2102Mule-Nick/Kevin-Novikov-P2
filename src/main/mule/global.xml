@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:db="http://www.mulesoft.org/schema/mule/db" xmlns:wsc="http://www.mulesoft.org/schema/mule/wsc"
+	xmlns:american-flights-api="http://www.mulesoft.org/schema/mule/american-flights-api"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/american-flights-api http://www.mulesoft.org/schema/mule/american-flights-api/current/mule-american-flights-api.xsd
+http://www.mulesoft.org/schema/mule/wsc http://www.mulesoft.org/schema/mule/wsc/current/mule-wsc.xsd
+http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd">
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="18686727-df5f-4b79-844c-0f883457aa3a" >
+		<http:listener-connection host="${http.host}" port="${http.port}" />
+	</http:listener-config>
+	<configuration-properties doc:name="Configuration properties" doc:id="082db622-0a5b-4df5-a8a8-dc24a952053c" file="config.yaml" />
+	<configuration doc:name="Configuration" doc:id="d4feef0c-4995-4690-9a17-b687f7f21837" defaultErrorHandler-ref="globalError_Handler" />
+	<db:config name="Database_Config" doc:name="Database Config" doc:id="a4a4678d-e23e-4742-95c3-27e7785f2966" >
+		<db:generic-connection url="jdbc:postgresql://mule2102-demo-db.ckho4ju5a7zw.us-east-2.rds.amazonaws.com:5432/postgres" driverClassName="org.postgresql.Driver" user="postgres" password="l0lInternet!"/>
+	</db:config>
+	<error-handler name="globalError_Handler" doc:id="c6e71264-1642-47ad-8d9f-e9ccc3d9a533" >
+		<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate: DELTA SOAP ERROR" doc:id="10bf4839-f432-4a25-936e-d0e3a0ea124b" when='#[error causedBy "WSC:CONNECTIVITY"]'>
+			<set-payload value="#[[{&#10;	errMsg: 'DELTA SOAP ERRORS: Error is processed by global Error Handler -&gt; onErrorPropagate',&#10;	errDesc: error.description,&#10;	errType: error.errorType.asString&#10;}]]" doc:name="Set Payload" doc:id="646f24e5-4285-4383-9f43-40c94ade0e70" />
+			<logger level="ERROR" doc:name="Logger" doc:id="a7714ccf-7acb-4e28-a819-91bdd23b6c54" message="#[payload]" />
+		</on-error-propagate>
+		<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate: ALL OTHER ERRORS" doc:id="9df803b9-ab46-4fd8-aa8d-279b94f7781f" >
+			<set-payload value="#[[{&#10;	errMsg: 'ALL OTHER ERRORS: Error is processed by global Error Handler -&gt; onErrorPropagate',&#10;	errDesc: error.description,&#10;	errType: error.errorType.asString&#10;}]]" doc:name="Set Payload" doc:id="3cacbe42-a554-4660-9fe0-d020eb000b2b" />
+			<logger level="ERROR" doc:name="Logger" doc:id="3c503fa9-2a15-4e11-8c09-29b9eeafb391" message="#[payload]" />
+		</on-error-propagate>
+	</error-handler>
+</mule>

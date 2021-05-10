@@ -1,0 +1,39 @@
+{
+  "configs": [
+    "American-Flights-Impl.xml",
+    "global.xml",
+    "American-Flights.xml"
+  ],
+  "secureProperties": [],
+  "redeploymentEnabled": true,
+  "name": "MUAFlights:kevin-novikov-p2:1.0.0-SNAPSHOT",
+  "minMuleVersion": "4.3.0",
+  "requiredProduct": "MULE_EE",
+  "classLoaderModelLoaderDescriptor": {
+    "id": "mule",
+    "attributes": {
+      "exportedPackages": [],
+      "exportedResources": [
+        "American-Flights-Impl.xml",
+        "American-Flights.xml",
+        "americanResponse.json",
+        "api/american-flights-api.raml",
+        "api/datatypes/Flight.raml",
+        "api/examples/AmericanFlightExample.raml",
+        "api/examples/AmericanFlightNoIDExample.raml",
+        "api/examples/FlightsExample.raml",
+        "api/mua-flights-api.raml",
+        "application-types.xml",
+        "config.yaml",
+        "examples/muaResponse.json",
+        "examples/unitedResponse.json",
+        "global.xml",
+        "log4j2.xml"
+      ]
+    }
+  },
+  "bundleDescriptorLoader": {
+    "id": "mule",
+    "attributes": {}
+  }
+}

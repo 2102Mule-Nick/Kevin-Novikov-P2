@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns:db="http://www.mulesoft.org/schema/mule/db"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<flow name="getAmericanFlights" doc:id="aa753cee-47a7-4203-8623-736b6602027c" >
+		<http:listener doc:name="GET:/flights" doc:id="f8aa52fc-26ad-4a38-b0da-1005598b98f6" config-ref="HTTP_Listener_config" path="/flights">
+			<http:response statusCode="#[vars.httpStatus default 200]">
+				<http:body ><![CDATA[#[output application/json --- payload]]]></http:body>
+			</http:response>
+			<http:error-response statusCode="#[vars.httpStatus default 500]" >
+				<http:body ><![CDATA[#[output application/json --- payload]]]></http:body>
+			</http:error-response>
+		</http:listener>
+		<db:select doc:name="Select" doc:id="1d5a8180-c670-498e-be45-676475aaa7ea" config-ref="Database_Config">
+			<db:sql ><![CDATA[select * from flights]]></db:sql>
+		</db:select>
+		<logger level="INFO" doc:name="Logger" doc:id="7b1f504b-b069-4724-8703-3594b525f59e" message="#[payload]"/>
+	</flow>
+	<flow name="getFlightById" doc:id="06cd46f2-19cb-4503-afff-c399d41b1949" >
+		<http:listener doc:name="Listener" doc:id="f026d84a-6e10-463a-ac39-a22c30038275" config-ref="HTTP_Listener_config" path="/flights/{ID}"/>
+		<ee:transform doc:name="Transform Message" doc:id="dab98577-1a36-43d2-b57a-b5cc2961046b" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<db:select doc:name="Select" doc:id="d1786685-2e95-4b49-9a14-e20d81f1847b" config-ref="Database_Config">
+			<db:sql ><![CDATA[select * from flights where id = :flightID]]></db:sql>
+			<db:input-parameters ><![CDATA[#[{
+	flightID: vars.'ID'
+}]]]></db:input-parameters>
+		</db:select>
+	</flow>
+	<flow name="createFlight" doc:id="87260d13-847c-45c0-8e31-96bd58793bcb" >
+		<http:listener doc:name="Listener" doc:id="fe1de2a6-968a-4d11-971b-97be55d12dcb" config-ref="HTTP_Listener_config" path="/flights" outputMimeType="application/json"/>
+		<ee:transform doc:name="Transform Message" doc:id="65daa89c-5701-44b8-aa15-2430f04723ca" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<db:insert doc:name="Insert" doc:id="a90e7101-e9dd-4e7d-92a1-c6262ccc8feb" config-ref="Database_Config">
+			<db:sql ><![CDATA[insert into flights values( :ID , :price, :emptyseats, :code, :origin, :destination, :departdate, :planetype, :totalseats)]]></db:sql>
+		</db:insert>
+		<ee:transform doc:name="Transform Message" doc:id="31494730-8a30-43d3-aaf6-9453d9863776" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/java
+---
+{
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+</mule>

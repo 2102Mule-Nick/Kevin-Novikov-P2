@@ -1,0 +1,105 @@
+#%RAML 1.0
+types:
+  AmericanFlight:
+    
+title: American Flights API
+description: This document represents System API for Mule United Airport.  At present, it supports resources ad methods that deal with flight information by American Airlines Flights.
+version: v1
+protocols:
+  - HTTP
+  - HTTPS
+
+baseUri: http://american-flights-kevinn.us-e2.cloudhub.io/api
+
+/flights:
+  get:
+    displayName: Get Flights
+    description: Retrieves list of flights.
+    queryParameters:
+      destination?:
+        description: "Represents 3-letter destination city code. For eg: DFW, LGA, SYD"
+        enum:
+          - LAX
+          - CLE
+          - SFO
+        type: string
+        pattern: "[A-Z]{3}"
+    responses:
+      "200":
+        description: Success
+        body:
+          application/json:
+            items:
+              type: AmericanFlight
+            examples:
+              output: !include examples/AmericanFlightExample.raml
+  post:
+    displayName: Add Flight
+    description: Add new flight details to existing flights
+    body:
+      application/json:
+        type: AmericanFlight
+        examples: !include examples/AmericanFlightExample.raml
+    responses:
+      "201":
+        description: Success
+        body:
+          application/json:
+            example:
+              strict: true
+              value:
+                message: Flight added successfully
+            type: object
+/flights/{ID}:
+  get:
+    displayName: Get Flight By ID
+    description: Retrieves flight information by its unique ID
+    responses:
+      "200":
+        description: Success
+        body:
+          application/json:
+            type: AmericanFlight
+            examples:
+              output: !include examples/AmericanFlightExample.raml
+  put:
+    displayName: Replace Flight
+    description: Replaces an existing flight
+    body:
+      application/json:
+        type: AmericanFlight
+        examples: 
+          output: !include examples/AmericanFlightNoIDExample.raml
+    responses:
+      200:
+        body:
+          application/json:
+            example:
+              message: Flight replaced
+  patch:
+    displayName: Patch flight
+    description: Partially updates a flight
+    responses:
+      "200":
+        body:
+          application/json:
+            example:
+              message: Flight patched successfully
+  delete:
+    displayName: Delete Flight
+    description: Deletes an existing flight
+    responses:
+      "200":
+        body:
+          application/json:
+            example:
+              message: Flight deleted
+  uriParameters:
+    ID:
+      description: |
+        Unique Flight ID's
+      default: 3
+      type: number
+      minimum: 1
+      maximum: 11
+      format: int
